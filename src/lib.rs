@@ -7,7 +7,9 @@ pub fn test_ansi() {
     let octal_esc = 0o033;
     let ansi_code_esc: char = '\x1B';
 
-    println!("Ringing a Bell (hopefully)");
+    let ansi_seq_clear_screen: &str = "\x1B[2J\x1B[H";
+
+    println!("{}Ringing a Bell (hopefully)", ansi_seq_clear_screen);
     println!("{}This is some test text", ansi_code_bell);
     //println!("{}{}This is some test text", ansi_code_esc, ansi_code_bell);
 
