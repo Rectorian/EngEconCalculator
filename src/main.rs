@@ -1,3 +1,3 @@
 fn main() {
-    println!("Hello, world!");
+    EngEconCalculator::test_ansi();
 }
