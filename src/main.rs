@@ -5,6 +5,6 @@ fn main() {
     //print!("{}", ansi_commands::ANSI_CLEAR);
     println!(
         "{}",
-        ansi_commands::disp_text_colored(String::from("This is a test"), 13)
+        ansi_commands::get_text_colored(String::from("This is a test"), 13)
     );
 }

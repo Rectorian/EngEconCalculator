@@ -20,7 +20,8 @@ pub fn test_ansi() {
     //This sequence will print the the text red until reset or changed.
     //NOTE: While iTerm2 supports 8-bit color, the default macOS terminal does not. Use the other
     //color representation (5;ColorNumberHere)
-    let ansi_color_picked: &str = "\x1B[38;2;255;0;0mThis text will print red";
+    let ansi_color_picked: &str =
+        "\x1B[38;2;255;0;0mThis text will print red in terminals that support 8-bit color";
     let ansi_text_color_sequence: &str = "\x1B[38:2:0:128:128m";
     //Don't use spaces within the sequence like the following [38 2;0;255;128m"; it causes an issue for some reason
 
@@ -50,9 +51,8 @@ pub mod ansi_commands {
     pub const ANSI_CLEAR: &str = "\x1B[2J\x1B[H";
     pub const ANSI_RESET_COL: &str = "\x1B[38m";
 
-    //An interesting facet, it seems that anything printed before I call a color change again, it
-    //seems to print with the formatting previously given from the ansi_color_picked &str slice
-    pub fn disp_text_colored(text: String, color_val: u8) -> String {
+    //Function to get colored text and reset it.
+    pub fn get_text_colored(text: String, color_val: u8) -> String {
         let set_color_sequence: String = format!("\x1B[38;5;{}m", color_val);
         format!("{}{}{}", set_color_sequence, text, ANSI_RESET_COL)
     }
