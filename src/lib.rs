@@ -56,4 +56,18 @@ pub mod ansi_commands {
         let set_color_sequence: String = format!("\x1B[38;5;{}m", color_val);
         format!("{}{}{}", set_color_sequence, text, ANSI_RESET_COL)
     }
+
+    pub fn disable_cursor() {
+        print!("\x1B[?;25;l");
+    }
+
+    pub fn enable_cursor() {
+        print!("\x1B[?;25;h");
+    }
+
+    use std::process::Command;
+
+    pub fn sleep_5() {
+        Command::new("sleep").arg("5").spawn();
+    }
 }

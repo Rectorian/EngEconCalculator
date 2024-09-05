@@ -1,10 +1,10 @@
 fn main() {
-    EngEconCalculator::test_ansi();
-    use EngEconCalculator::ansi_commands;
-
-    //print!("{}", ansi_commands::ANSI_CLEAR);
+    print!("{}", EngEconCalculator::ansi_commands::ANSI_CLEAR);
     println!(
         "{}",
-        ansi_commands::get_text_colored(String::from("This is a test"), 13)
+        EngEconCalculator::ansi_commands::get_text_colored(
+            String::from("Welcome to the Calculator"),
+            6
+        )
     );
 }
