@@ -1,5 +1,6 @@
 fn main() {
-    print!("{}", EngEconCalculator::ansi_commands::ANSI_CLEAR);
+    EngEconCalculator::ansi_commands::clear_screen();
+
     println!(
         "{}",
         EngEconCalculator::ansi_commands::get_text_colored(
