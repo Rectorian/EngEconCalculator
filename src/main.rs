@@ -27,10 +27,17 @@ fn main() {
         }
     };
 
-    let result = format!("{}", result);
+    let result = format!("${:.2}", result);
 
     println!(
         "Result for period of 5 years, rate of 10% compound, and final amount of $100k: {}",
         gtc(result.as_str(), 10)
     );
+
+    match EngEconCalculator::invest_items::investment_calculations::calculations::unit_test(
+        "exponential",
+    ) {
+        Ok(out) => println!("{}", out),
+        Err(err_mes) => println!("{}", err_mes),
+    }
 }

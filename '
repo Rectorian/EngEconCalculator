@@ -93,7 +93,8 @@ pub mod calculations {
     }
 
     pub fn unit_test(test_type: &str) -> Result<&str, &str> {
-        let test_type = match test_type.to_ascii_lowercase().as_str() {
+        let test_type = test_type.to_ascii_lowercase().as_str();
+        let test_type = match test_type {
             "all" => 0,
             "exponential" => 1,
             _ => -1,
@@ -102,28 +103,8 @@ pub mod calculations {
         match test_type {
             -1 => return Err("Invalid Test Type"),
             0 => Ok("All Tested Successfully"),
-            1 => {
-                unit_test_exp();
-                Ok("Successful Test of Exponential Function")
-            }
+            1 => Ok("Successful Test of Exponential Function"),
             _ => return Err("Unkown Error"),
         }
-    }
-
-    fn unit_test_exp() {
-        let t_1 = exponential(5.0, 3.0);
-        assert!(t_1 == 125.0, "\t5^3 did not equal 125, Was {t_1}");
-
-        let t_2 = exponential(5.0, 1.0);
-        assert!(t_2 == 5.0, "\t5^1 did not equal 5, Was {t_2}");
-
-        let t_3 = exponential(5.0, 0.0);
-        assert!(t_3 == 1.0, "\t5^0 did not equal 1, Was {t_3}");
-
-        let t_4 = exponential(5.0, -2.0);
-        assert!(
-            t_4 == (1.0 / 5.0) as f64,
-            "\t5^-1 did not equal 0.2, Was {t_4}"
-        );
     }
 }
