@@ -1,7 +1,7 @@
 pub mod invest_items;
 
 pub mod ansi_commands {
-    const ANSI_CLEAR: &str = "\x1B[2J\x1B[H";
+    const ANSI_CLEAR: &str = "\x1B[3J\x1B[H";
     const ANSI_RESET_COL: &str = "\x1B[39m";
 
     //Function to get colored text and reset it.

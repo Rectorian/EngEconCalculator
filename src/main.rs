@@ -59,14 +59,14 @@ fn main() {
         gtc(result.as_str(), 10)
     );
 
-    match EngEconCalculator::invest_items::investment_calculations::calculations::unit_test(
+    match EngEconCalculator::invest_items::investment_calculations::unit_tests::unit_test(
         "exponential",
     ) {
         Ok(out) => println!("{}", out),
         Err(err_mes) => println!("{}", err_mes),
     }
 
-    match EngEconCalculator::invest_items::investment_calculations::calculations::unit_test(
+    match EngEconCalculator::invest_items::investment_calculations::unit_tests::unit_test(
         "uniform Payments",
     ) {
         Ok(out) => println!("{}", out),
