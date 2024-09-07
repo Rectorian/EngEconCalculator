@@ -208,6 +208,98 @@ pub mod calculations {
         p * (top / bottom)
     }
 
+    pub fn f_from_a(
+        a_amount: &data::AmountType,
+        t_periods: &data::AmountType,
+        i_rate: &data::AmountType,
+    ) -> Result<f64, String> {
+        //The following is quite repetitive due to not being able to make a parameter a specific
+        //variant, just of the enum overall type
+        let a_amount = match a_amount {
+            data::AmountType::Uniform(amt) => amt.get_f64(),
+            _other => {
+                return Err(String::from(data::WTA));
+            }
+        };
+
+        let t_periods = match t_periods {
+            data::AmountType::TimePeriods(num_periods) => num_periods.get_f64(),
+            _other => {
+                return Err(String::from(data::WTP));
+            }
+        };
+
+        let i_rate = match i_rate {
+            data::AmountType::InterestRate(i_type) => i_type,
+            _other => {
+                return Err(String::from(data::WTI));
+            }
+        };
+
+        //What a world we live in
+        let i_rate = match i_rate {
+            data::InterestType::Compound(rate) => *rate,
+            _other => {
+                return Err(String::from(data::WIT));
+            }
+        };
+
+        Ok(calc_f_from_a(a_amount, i_rate, t_periods))
+    }
+
+    fn calc_f_from_a(a: f64, i: f64, n: f64) -> f64 {
+        let top = exponential(1.0 + i, n) - 1.0;
+        let bottom = i;
+
+        a * (top / bottom)
+    }
+
+    pub fn a_from_f(
+        f_amount: &data::AmountType,
+        t_periods: &data::AmountType,
+        i_rate: &data::AmountType,
+    ) -> Result<f64, String> {
+        //The following is quite repetitive due to not being able to make a parameter a specific
+        //variant, just of the enum overall type
+        let f_amount = match f_amount {
+            data::AmountType::Final(amt) => amt.get_f64(),
+            _other => {
+                return Err(String::from(data::WTA));
+            }
+        };
+
+        let t_periods = match t_periods {
+            data::AmountType::TimePeriods(num_periods) => num_periods.get_f64(),
+            _other => {
+                return Err(String::from(data::WTP));
+            }
+        };
+
+        let i_rate = match i_rate {
+            data::AmountType::InterestRate(i_type) => i_type,
+            _other => {
+                return Err(String::from(data::WTI));
+            }
+        };
+
+        //What a world we live in
+        let i_rate = match i_rate {
+            data::InterestType::Compound(rate) => *rate,
+            _other => {
+                return Err(String::from(data::WIT));
+            }
+        };
+
+        Ok(calc_a_from_f(f_amount, i_rate, t_periods))
+    }
+
+    fn calc_a_from_f(f: f64, i: f64, n: f64) -> f64 {
+        let top = i;
+        let bottom = exponential(1.0 + i, n) - 1.0;
+
+        f * (top / bottom)
+    }
+
     //Function to select and run unit_tests
     pub fn unit_test(test_type: &str) -> Result<&str, &str> {
         let test_type = match test_type.to_ascii_lowercase().as_str() {
@@ -225,7 +317,7 @@ pub mod calculations {
                 Ok("Successful Test of Exponential Function")
             }
             2 => {
-                unit_test_uniform_payments();
+                unit_test_uniform_payments(false);
                 Ok("Successful Test of all Uniform Payment Calculations")
             }
             _ => return Err("Unkown Error"),
@@ -249,35 +341,93 @@ pub mod calculations {
         );
     }
 
-    fn unit_test_uniform_payments() {
-        use super::super::super::ansi_commands::get_text_colored as gtc;
-        let inputs: Vec<data::AmountType> = vec![
-            data::AmountType::Final(data::Amount::Fl64(100000.0)),
-            data::AmountType::Principal(data::Amount::Fl64(50000.0)),
-            data::AmountType::Uniform(data::Amount::In64(5000)),
-            data::AmountType::TimePeriods(data::Amount::In64(5)),
-            data::AmountType::InterestRate(data::InterestType::Simple(0.20)),
-            data::AmountType::InterestRate(data::InterestType::Compound(0.12)),
-        ];
+    fn unit_test_uniform_payments(limited: bool) {
+        if !limited {
+            use super::super::super::ansi_commands::get_text_colored as gtc;
+            let inputs: Vec<data::AmountType> = vec![
+                data::AmountType::Final(data::Amount::Fl64(100000.0)),
+                data::AmountType::Principal(data::Amount::Fl64(50000.0)),
+                data::AmountType::Uniform(data::Amount::In64(5000)),
+                data::AmountType::TimePeriods(data::Amount::In64(5)),
+                data::AmountType::InterestRate(data::InterestType::Simple(0.20)),
+                data::AmountType::InterestRate(data::InterestType::Compound(0.12)),
+            ];
 
-        let inputs_2 = inputs.clone();
-        let inputs_3 = inputs.clone();
+            let inputs_2 = inputs.clone();
+            let inputs_3 = inputs.clone();
 
-        for in_1 in &inputs {
-            for in_2 in &inputs_2 {
-                for in_3 in &inputs_3 {
-                    print!(
-                        "Trying f_from_p with\n\tinput 1: {}\n\tinput 2: {}\n\tinput 3:{}\nResult: ",
-                        in_1, in_2, in_3
-                    );
+            for in_1 in &inputs {
+                for in_2 in &inputs_2 {
+                    for in_3 in &inputs_3 {
+                        print!(
+                            "Trying with inputs:\n\tinput 1: {}\n\tinput 2: {}\n\tinput 3:{}\nResult:\n",
+                            in_1, in_2, in_3
+                        );
 
-                    match f_from_p(in_1, in_2, in_3) {
-                        Ok(num) => {
-                            let temp = format!("${:.2}", num);
-                            println!("{}", gtc(temp.as_str(), 10));
+                        print!("\tf_from_p: ");
+                        match f_from_p(in_1, in_2, in_3) {
+                            Ok(num) => {
+                                let temp = format!("${:.2}", num);
+                                println!("{}", gtc(temp.as_str(), 10));
+                            }
+                            Err(error_message) => {
+                                println!("{}", gtc(error_message.as_str(), 9));
+                            }
                         }
-                        Err(error_message) => {
-                            println!("{}", gtc(error_message.as_str(), 9));
+
+                        print!("\tp_from_f: ");
+                        match p_from_f(in_1, in_2, in_3) {
+                            Ok(num) => {
+                                let temp = format!("${:.2}", num);
+                                println!("{}", gtc(temp.as_str(), 10));
+                            }
+                            Err(error_message) => {
+                                println!("{}", gtc(error_message.as_str(), 9));
+                            }
+                        }
+
+                        print!("\tp_from_a: ");
+                        match p_from_a(in_1, in_2, in_3) {
+                            Ok(num) => {
+                                let temp = format!("${:.2}", num);
+                                println!("{}", gtc(temp.as_str(), 10));
+                            }
+                            Err(error_message) => {
+                                println!("{}", gtc(error_message.as_str(), 9));
+                            }
+                        }
+
+                        print!("\ta_from_p: ");
+                        match a_from_p(in_1, in_2, in_3) {
+                            Ok(num) => {
+                                let temp = format!("${:.2}", num);
+                                println!("{}", gtc(temp.as_str(), 10));
+                            }
+                            Err(error_message) => {
+                                println!("{}", gtc(error_message.as_str(), 9));
+                            }
+                        }
+
+                        print!("\tf_from_a: ");
+                        match f_from_a(in_1, in_2, in_3) {
+                            Ok(num) => {
+                                let temp = format!("${:.2}", num);
+                                println!("{}", gtc(temp.as_str(), 10));
+                            }
+                            Err(error_message) => {
+                                println!("{}", gtc(error_message.as_str(), 9));
+                            }
+                        }
+
+                        print!("\ta_from_f: ");
+                        match a_from_f(in_1, in_2, in_3) {
+                            Ok(num) => {
+                                let temp = format!("${:.2}", num);
+                                println!("{}", gtc(temp.as_str(), 10));
+                            }
+                            Err(error_message) => {
+                                println!("{}", gtc(error_message.as_str(), 9));
+                            }
                         }
                     }
                 }
