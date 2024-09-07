@@ -61,7 +61,7 @@ fn unit_test_uniform_payments(limited: bool) {
             for in_2 in &inputs_2 {
                 for in_3 in &inputs_3 {
                     print!(
-                        "Trying with inputs:\n\tinput 1: {}\n\tinput 2: {}\n\tinput 3:{}\nResult:\n",
+                        "Trying with inputs:\n\tinput 1: {}\n\tinput 2: {}\n\tinput 3: {}\nResult:\n",
                         in_1, in_2, in_3
                     );
 

@@ -1,6 +1,9 @@
 fn main() {
-    EngEconCalculator::ansi_commands::clear_screen();
+    EngEconCalculator::user_interface::user_f_from_p();
+}
 
+fn test_1() {
+    EngEconCalculator::ansi_commands::clear_screen();
     use EngEconCalculator::ansi_commands::get_text_colored as gtc;
 
     println!(

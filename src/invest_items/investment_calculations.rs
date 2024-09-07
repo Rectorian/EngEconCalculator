@@ -106,8 +106,6 @@ pub mod calculations {
         t_periods: &data::AmountType,
         i_rate: &data::AmountType,
     ) -> Result<f64, String> {
-        //The following is quite repetitive due to not being able to make a parameter a specific
-        //variant, just of the enum overall type
         let a_amount = match a_amount {
             data::AmountType::Uniform(amt) => amt.get_f64(),
             _other => {
@@ -166,8 +164,6 @@ pub mod calculations {
         t_periods: &data::AmountType,
         i_rate: &data::AmountType,
     ) -> Result<f64, String> {
-        //The following is quite repetitive due to not being able to make a parameter a specific
-        //variant, just of the enum overall type
         let p_amount = match p_amount {
             data::AmountType::Principal(amt) => amt.get_f64(),
             _other => {
@@ -208,13 +204,12 @@ pub mod calculations {
         p * (top / bottom)
     }
 
+    //Calculates final value from uniform payments
     pub fn f_from_a(
         a_amount: &data::AmountType,
         t_periods: &data::AmountType,
         i_rate: &data::AmountType,
     ) -> Result<f64, String> {
-        //The following is quite repetitive due to not being able to make a parameter a specific
-        //variant, just of the enum overall type
         let a_amount = match a_amount {
             data::AmountType::Uniform(amt) => amt.get_f64(),
             _other => {
@@ -236,7 +231,6 @@ pub mod calculations {
             }
         };
 
-        //What a world we live in
         let i_rate = match i_rate {
             data::InterestType::Compound(rate) => *rate,
             _other => {
@@ -259,8 +253,6 @@ pub mod calculations {
         t_periods: &data::AmountType,
         i_rate: &data::AmountType,
     ) -> Result<f64, String> {
-        //The following is quite repetitive due to not being able to make a parameter a specific
-        //variant, just of the enum overall type
         let f_amount = match f_amount {
             data::AmountType::Final(amt) => amt.get_f64(),
             _other => {
@@ -282,7 +274,6 @@ pub mod calculations {
             }
         };
 
-        //What a world we live in
         let i_rate = match i_rate {
             data::InterestType::Compound(rate) => *rate,
             _other => {
@@ -298,6 +289,205 @@ pub mod calculations {
         let bottom = exponential(1.0 + i, n) - 1.0;
 
         f * (top / bottom)
+    }
+
+    pub fn p_from_g(
+        g_amount: &data::AmountType,
+        t_periods: &data::AmountType,
+        i_rate: &data::AmountType,
+    ) -> Result<f64, String> {
+        let g_amount = match g_amount {
+            data::AmountType::Gradient(amt) => amt.get_f64(),
+            _other => {
+                return Err(String::from(data::WTA));
+            }
+        };
+
+        let t_periods = match t_periods {
+            data::AmountType::TimePeriods(num_periods) => num_periods.get_f64(),
+            _other => {
+                return Err(String::from(data::WTP));
+            }
+        };
+
+        let i_rate = match i_rate {
+            data::AmountType::InterestRate(i_type) => i_type,
+            _other => {
+                return Err(String::from(data::WTI));
+            }
+        };
+
+        let i_rate = match i_rate {
+            data::InterestType::Compound(rate) => *rate,
+            _other => {
+                return Err(String::from(data::WIT));
+            }
+        };
+
+        Ok(calc_p_from_g(g_amount, i_rate, t_periods))
+    }
+
+    fn calc_p_from_g(g: f64, i: f64, n: f64) -> f64 {
+        let top_1 = g;
+        let top_2 = exponential(1.0 + i, n) - 1.0;
+        let top_3 = n;
+        let bot_1 = i;
+        let bot_2 = i * exponential(1.0 + i, n);
+        let bot_3 = exponential(1.0 + i, n);
+
+        (top_1 / bot_1) * ((top_2 / bot_2) - (top_3 / bot_3))
+    }
+
+    pub fn a_from_g(
+        g_amount: &data::AmountType,
+        t_periods: &data::AmountType,
+        i_rate: &data::AmountType,
+    ) -> Result<f64, String> {
+        let g_amount = match g_amount {
+            data::AmountType::Gradient(amt) => amt.get_f64(),
+            _other => {
+                return Err(String::from(data::WTA));
+            }
+        };
+
+        let t_periods = match t_periods {
+            data::AmountType::TimePeriods(num_periods) => num_periods.get_f64(),
+            _other => {
+                return Err(String::from(data::WTP));
+            }
+        };
+
+        let i_rate = match i_rate {
+            data::AmountType::InterestRate(i_type) => i_type,
+            _other => {
+                return Err(String::from(data::WTI));
+            }
+        };
+
+        let i_rate = match i_rate {
+            data::InterestType::Compound(rate) => *rate,
+            _other => {
+                return Err(String::from(data::WIT));
+            }
+        };
+
+        Ok(calc_a_from_g(g_amount, i_rate, t_periods))
+    }
+
+    fn calc_a_from_g(g: f64, i: f64, n: f64) -> f64 {
+        let top_1 = 1.0;
+        let top_2 = n;
+        let bot_1 = i;
+        let bot_2 = exponential(1.0 + i, n) - 1.0;
+
+        g * ((top_1 / bot_1) - (top_2 / bot_2))
+    }
+
+    pub fn f_from_g(
+        g_amount: &data::AmountType,
+        t_periods: &data::AmountType,
+        i_rate: &data::AmountType,
+    ) -> Result<f64, String> {
+        let g_amount = match g_amount {
+            data::AmountType::Gradient(amt) => amt.get_f64(),
+            _other => {
+                return Err(String::from(data::WTA));
+            }
+        };
+
+        let t_periods = match t_periods {
+            data::AmountType::TimePeriods(num_periods) => num_periods.get_f64(),
+            _other => {
+                return Err(String::from(data::WTP));
+            }
+        };
+
+        let i_rate = match i_rate {
+            data::AmountType::InterestRate(i_type) => i_type,
+            _other => {
+                return Err(String::from(data::WTI));
+            }
+        };
+
+        let i_rate = match i_rate {
+            data::InterestType::Compound(rate) => *rate,
+            _other => {
+                return Err(String::from(data::WIT));
+            }
+        };
+
+        Ok(calc_f_from_g(g_amount, i_rate, t_periods))
+    }
+
+    fn calc_f_from_g(g: f64, i: f64, n: f64) -> f64 {
+        let term_1 = 1.0 / i;
+        let term_2 = (exponential(1.0 + i, n) - 1.0) / i;
+        let term_3 = (1.0 / i) * n;
+
+        g * ((term_1 * term_2) - term_3)
+    }
+
+    pub fn p_from_g_rate(
+        a_initial: &data::AmountType,
+        g_rate: &data::AmountType,
+        t_periods: &data::AmountType,
+        i_rate: &data::AmountType,
+    ) -> Result<f64, String> {
+        let a_initial = match a_initial {
+            data::AmountType::Uniform(amt) => amt.get_f64(),
+            _other => {
+                return Err(String::from(data::WTA));
+            }
+        };
+
+        let g_rate = match g_rate {
+            data::AmountType::GradientRate(rate_type) => rate_type,
+            _other => {
+                return Err(String::from(data::WTI));
+            }
+        };
+
+        let g_rate = match g_rate {
+            data::InterestType::Compound(amt) => *amt,
+            _other => {
+                return Err(String::from(data::WIT));
+            }
+        };
+
+        let t_periods = match t_periods {
+            data::AmountType::TimePeriods(num_periods) => num_periods.get_f64(),
+            _other => {
+                return Err(String::from(data::WTP));
+            }
+        };
+
+        let i_rate = match i_rate {
+            data::AmountType::InterestRate(i_type) => i_type,
+            _other => {
+                return Err(String::from(data::WTI));
+            }
+        };
+
+        let i_rate = match i_rate {
+            data::InterestType::Compound(rate) => *rate,
+            _other => {
+                return Err(String::from(data::WIT));
+            }
+        };
+
+        Ok(calc_p_from_g_rate(a_initial, g_rate, i_rate, t_periods))
+    }
+
+    fn calc_p_from_g_rate(a: f64, g: f64, i: f64, n: f64) -> f64 {
+        if g == i {
+            (n * a) / (1.0 + i)
+        } else {
+            let term_1 = exponential((1.0 + g) / (1.0 + i), n);
+            let term_2 = 1.0 - term_1;
+            let term_3 = term_2 / (i - g);
+
+            a * term_3
+        }
     }
 }
 
