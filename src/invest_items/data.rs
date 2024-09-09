@@ -94,8 +94,10 @@ impl std::fmt::Display for AmountType {
             AmountType::InterestRate(_rate) => prepend = "Interest Rate: ",
         };
 
-        //Write the prepend to the formatter
-        write!(f, "{}", prepend);
+        //Write the prepend to the formatter, handle error if necessary
+        if let Err(err_mes) = write!(f, "{}", prepend) {
+            return Err(err_mes);
+        }
 
         //Now we can use display of the bundled data.
         match self {

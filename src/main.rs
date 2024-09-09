@@ -1,54 +1,57 @@
 fn main() {
-    EngEconCalculator::ansi_commands::clear_screen(false);
-    use EngEconCalculator::user_interface::*;
+    //EngEconCalculator::ansi_commands::clear_screen(false);
+    //use EngEconCalculator::user_interface::*;
 
     //user_f_from_p();
     //user_p_from_f();
     //user_a_from_p();
-    user_p_from_a();
+    //user_p_from_a();
     //user_a_from_f();
     //user_f_from_a();
+
+    run();
 }
 
 fn run() {
     EngEconCalculator::ansi_commands::clear_screen(false);
     use EngEconCalculator::user_interface as UI;
 
-    let mut user_input = String::new();
+    let mut user_input = String::from("Bruh");
 
     while {
         //Simple do part of the loop to grab the user input. Then checks for exit and returns
         //corresponding conditional
-        user_input = UI::grab_user_input("What would you like to calculate? (Type ? for options)");
-        match user_input.to_lowercase().as_str() {
+        user_input = UI::grab_user_input("What would you like to calculate? (Type ? for options)")
+            .trim()
+            .to_lowercase();
+
+        match user_input.as_str() {
             "e" | "end" | "exit" => false,
             _ => true,
         }
     } {
-        match user_input.to_lowercase().as_str() {
+        match user_input.trim().to_lowercase().as_str() {
             "?" => {
+                EngEconCalculator::ansi_commands::clear_screen(true);
                 println!("Options are:");
                 println!("\tExit (E, End, Exit)");
                 println!("\tPresent Value (P, Present)");
                 println!("\tFuture Value (F, Future)");
                 println!("\tUniform Value (A, U, Uniform)");
                 println!("\tArithmetic Gradient (AG, Arithmetic)");
-                println!("\tPresent Value Equivalent of Geometric Gradient (PG, Geometric)");
             }
             "p" | "present" => {
-                //TODO Put Function Here
+                present_selected();
             }
             "f" | "future" => {
-                //TODO Put Function Here
+                future_selected();
             }
             "a" | "u" | "uniform" => {
-                //TODO Put function here
+                uniform_selected();
             }
             "ag" | "arithmetic" => {
                 //TODO Put Function Here
-            }
-            "pg" | "geometric" => {
-                //TODO Put Function Here
+                println!("Not Yet Implemented\n");
             }
             _ => {
                 EngEconCalculator::ansi_commands::clear_screen(true);
@@ -57,79 +60,153 @@ fn run() {
             }
         }
     }
+
+    EngEconCalculator::ansi_commands::clear_screen(false);
 }
 
-fn _test_1() {
-    EngEconCalculator::ansi_commands::clear_screen(false);
-    use EngEconCalculator::ansi_commands::get_text_colored as gtc;
+fn present_selected() {
+    EngEconCalculator::ansi_commands::clear_screen(true);
+    use EngEconCalculator::user_interface as UI;
 
-    println!(
-        "{}",
-        EngEconCalculator::ansi_commands::get_text_colored(
-            "This is a test of the principal calculation:",
-            13
-        )
-    );
+    let mut user_input = String::new();
 
-    let result = {
-        use EngEconCalculator::invest_items::data;
-        use EngEconCalculator::invest_items::investment_calculations::calculations;
-
-        let final_amt = data::AmountType::Final(data::Amount::In64(100000));
-        let period = data::AmountType::TimePeriods(data::Amount::In32(5));
-        let rate = data::AmountType::InterestRate(data::InterestType::Compound(0.10));
-
-        match calculations::p_from_f(&final_amt, &period, &rate) {
-            Ok(num) => num,
-            Err(error_message) => {
-                println!("Error: {}", error_message);
-                0.0
+    while {
+        user_input = UI::grab_user_input(
+            "What would you like to calculate Present value from? (Input ? for options)",
+        );
+        user_input = user_input.trim().to_lowercase();
+        match user_input.to_lowercase().as_str() {
+            "e" | "end" | "exit" => false,
+            _ => true,
+        }
+    } {
+        match user_input.as_str() {
+            "?" => {
+                EngEconCalculator::ansi_commands::clear_screen(true);
+                println!("Options are:");
+                println!("\tFuture Value (F, Final)");
+                println!("\tUniform Value (A, U, Uniform)");
+                println!("\tArithmetic Gradient (AG, Arithmetic)");
+                println!("\tGeometric Gradient (GG, Geometric)");
+                continue;
+            }
+            "f" | "final" => {
+                UI::user_p_from_f();
+            }
+            "a" | "u" | "uniform" => {
+                UI::user_p_from_a();
+            }
+            "ag" | "arithmetic" => {
+                UI::user_p_from_g();
+            }
+            "gg" | "geometric" => {
+                UI::user_p_from_g_rate();
+            }
+            _ => {
+                EngEconCalculator::ansi_commands::clear_screen(true);
+                println!("Invalid Input. Please Try Again\n");
+                continue;
             }
         }
-    };
 
-    let result = format!("${:.2}", result);
-
-    println!(
-        "Result for period of 5 years, rate of 10% compound, and final amount of $100k: {}",
-        gtc(result.as_str(), 10)
-    );
-
-    let result = {
-        use EngEconCalculator::invest_items::data;
-        use EngEconCalculator::invest_items::investment_calculations::calculations;
-
-        let final_amt = data::AmountType::Principal(data::Amount::In64(100000));
-        let period = data::AmountType::TimePeriods(data::Amount::In32(5));
-        let rate = data::AmountType::InterestRate(data::InterestType::Simple(0.10));
-
-        match calculations::f_from_p(&final_amt, &period, &rate) {
-            Ok(num) => num,
-            Err(error_message) => {
-                println!("Error: {}", error_message);
-                0.0
-            }
-        }
-    };
-
-    let result = format!("${:.2}", result);
-
-    println!(
-        "Result for period of 5 years, rate of 10% compounding, and principal amount of $100k: {}",
-        gtc(result.as_str(), 10)
-    );
-
-    match EngEconCalculator::invest_items::investment_calculations::unit_tests::unit_test(
-        "exponential",
-    ) {
-        Ok(out) => println!("{}", out),
-        Err(err_mes) => println!("{}", err_mes),
+        break;
     }
+}
 
-    match EngEconCalculator::invest_items::investment_calculations::unit_tests::unit_test(
-        "uniform Payments",
-    ) {
-        Ok(out) => println!("{}", out),
-        Err(err_mes) => println!("{}", err_mes),
+fn future_selected() {
+    EngEconCalculator::ansi_commands::clear_screen(true);
+    use EngEconCalculator::user_interface as UI;
+
+    let mut user_input = String::new();
+
+    while {
+        user_input = UI::grab_user_input(
+            "What would you like to calculate Future value from? (Input ? for options)",
+        );
+        user_input = user_input.trim().to_lowercase();
+        match user_input.to_lowercase().as_str() {
+            "e" | "end" | "exit" => false,
+            _ => true,
+        }
+    } {
+        match user_input.as_str() {
+            "?" => {
+                EngEconCalculator::ansi_commands::clear_screen(true);
+                println!("Options are:");
+                println!("\tPresent Value (P, Present)");
+                println!("\tUniform Value (A, U, Uniform)");
+                println!("\tArithmetic Gradient (AG, Arithmetic)");
+                println!("\tGeometric Gradient (GG, Geometric)");
+                continue;
+            }
+            "p" | "present" => {
+                UI::user_f_from_p();
+            }
+            "a" | "u" | "uniform" => {
+                UI::user_f_from_a();
+            }
+            "ag" | "arithmetic" => {
+                UI::user_f_from_g();
+            }
+            "gg" | "geometric" => {
+                println!("Not Yet Implemented");
+            }
+            _ => {
+                EngEconCalculator::ansi_commands::clear_screen(true);
+                println!("Invalid Input. Please Try Again\n");
+                continue;
+            }
+        }
+
+        break;
+    }
+}
+
+fn uniform_selected() {
+    EngEconCalculator::ansi_commands::clear_screen(true);
+    use EngEconCalculator::user_interface as UI;
+
+    let mut user_input = String::new();
+
+    while {
+        user_input = UI::grab_user_input(
+            "What would you like to calculate Uniform value from? (Input ? for options)",
+        );
+        user_input = user_input.trim().to_lowercase();
+        match user_input.to_lowercase().as_str() {
+            "e" | "end" | "exit" => false,
+            _ => true,
+        }
+    } {
+        match user_input.as_str() {
+            "?" => {
+                EngEconCalculator::ansi_commands::clear_screen(true);
+                println!("Options are:");
+                println!("\tPresent Value (P, Present)");
+                println!("\tFuture Value (F, Future)");
+                println!("\tArithmetic Gradient (AG, Arithmetic)");
+                println!("\tGeometric Gradient (GG, Geometric)");
+                continue;
+            }
+            "p" | "present" => {
+                UI::user_a_from_p();
+            }
+            "f" | "future" => {
+                UI::user_a_from_f();
+            }
+            "ag" | "arithmetic" => {
+                UI::user_a_from_g();
+            }
+            "gg" | "geometric" => {
+                println!("Not Yet Implemented");
+            }
+            _ => {
+                EngEconCalculator::ansi_commands::clear_screen(true);
+                println!("Invalid Input. Please Try Again\n");
+                continue;
+            }
+        }
+
+        break;
     }
 }

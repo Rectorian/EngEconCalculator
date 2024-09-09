@@ -3,7 +3,7 @@ pub mod invest_items;
 pub mod ansi_commands {
     const ANSI_CLEAR: &str = "\x1B[3J\x1B[2J\x1B[H";
     const ANSI_RESET_COL: &str = "\x1B[39m";
-    const RS_ON: bool = false;
+    const RS_ON: bool = true;
 
     //Function to get colored text and reset it.
     pub fn get_text_colored(text: &str, color_val: u8) -> String {
@@ -414,6 +414,6 @@ pub mod user_interface {
             Err(err_mes) => gtc(err_mes.as_str(), 9),
         };
 
-        println!("Future Worth of {}: {}", gradient, result);
+        println!("Present Worth of {}: {}", gradient, result);
     }
 }
