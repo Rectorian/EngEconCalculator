@@ -489,6 +489,43 @@ pub mod calculations {
             a * term_3
         }
     }
+
+    //A combination of other calculations to get F from a Geometric Gradient
+    pub fn f_from_g_rate(
+        a_initial: &data::AmountType,
+        g_rate: &data::AmountType,
+        t_periods: &data::AmountType,
+        i_rate: &data::AmountType,
+    ) -> Result<f64, String> {
+        let p_geometric_result = p_from_g_rate(&a_initial, &g_rate, &t_periods, &i_rate);
+
+        let p_amount = match p_geometric_result {
+            Ok(val) => data::AmountType::Principal(data::Amount::Fl64(val)),
+            Err(err_mes) => {
+                return Err(err_mes);
+            }
+        };
+
+        f_from_p(&p_amount, &t_periods, &i_rate)
+    }
+
+    pub fn a_from_g_rate(
+        a_initial: &data::AmountType,
+        g_rate: &data::AmountType,
+        t_periods: &data::AmountType,
+        i_rate: &data::AmountType,
+    ) -> Result<f64, String> {
+        let p_geometric_result = p_from_g_rate(&a_initial, &g_rate, &t_periods, &i_rate);
+
+        let p_amount = match p_geometric_result {
+            Ok(val) => data::AmountType::Principal(data::Amount::Fl64(val)),
+            Err(err_mes) => {
+                return Err(err_mes);
+            }
+        };
+
+        a_from_p(&p_amount, &t_periods, &i_rate)
+    }
 }
 
 pub mod unit_tests;

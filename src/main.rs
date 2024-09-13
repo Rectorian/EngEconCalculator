@@ -9,7 +9,10 @@ fn main() {
     //user_a_from_f();
     //user_f_from_a();
 
-    run();
+    //run();
+
+    EngEconCalculator::ansi_commands::disable_text_wrapping();
+    EngEconCalculator::invest_items::cli_disp::test_printing();
 }
 
 fn run() {
@@ -149,7 +152,7 @@ fn future_selected() {
                 UI::user_f_from_g();
             }
             "gg" | "geometric" => {
-                println!("Not Yet Implemented");
+                UI::user_f_from_g_rate();
             }
             _ => {
                 EngEconCalculator::ansi_commands::clear_screen(true);
@@ -198,7 +201,7 @@ fn uniform_selected() {
                 UI::user_a_from_g();
             }
             "gg" | "geometric" => {
-                println!("Not Yet Implemented");
+                UI::user_a_from_g_rate();
             }
             _ => {
                 EngEconCalculator::ansi_commands::clear_screen(true);

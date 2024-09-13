@@ -75,6 +75,10 @@ pub mod user_interface {
         out_num
     }
 
+    pub fn get_amount_type(text_prompt: &str) -> super::invest_items::data::AmountType {
+        use super::invest_items::data;
+    }
+
     pub fn user_f_from_p() {
         use super::{
             ansi_commands::{clear_screen as cs, get_text_colored as gtc},
@@ -415,5 +419,89 @@ pub mod user_interface {
         };
 
         println!("Present Worth of {}: {}", gradient, result);
+    }
+
+    pub fn user_f_from_g_rate() {
+        use super::{
+            ansi_commands::{clear_screen as cs, get_text_colored as gtc},
+            invest_items::{data, investment_calculations},
+        };
+
+        cs(true);
+
+        let gradient = data::AmountType::GradientRate(data::InterestType::Compound(grab_user_num(
+            "Enter Gradient Rate as Decimal:",
+        )));
+
+        let initial_payment = data::AmountType::Uniform(data::Amount::Fl64(grab_user_num(
+            "Enter the Initial Payment Amount:",
+        )));
+
+        let interest = data::AmountType::InterestRate(data::InterestType::Compound(grab_user_num(
+            "Enter Interest Rate as Decimal:",
+        )));
+
+        let periods = data::AmountType::TimePeriods(data::Amount::In32(grab_user_num(
+            "Enter Number of Compounding Periods:",
+        ) as i32));
+
+        cs(true);
+
+        let result = match investment_calculations::calculations::f_from_g_rate(
+            &initial_payment,
+            &gradient,
+            &periods,
+            &interest,
+        ) {
+            Ok(num) => {
+                let out_num_format = format!("${:.2}", num);
+                gtc(out_num_format.as_str(), 10)
+            }
+            Err(err_mes) => gtc(err_mes.as_str(), 9),
+        };
+
+        println!("Future Worth of {}: {}", gradient, result);
+    }
+
+    pub fn user_a_from_g_rate() {
+        use super::{
+            ansi_commands::{clear_screen as cs, get_text_colored as gtc},
+            invest_items::{data, investment_calculations},
+        };
+
+        cs(true);
+
+        let gradient = data::AmountType::GradientRate(data::InterestType::Compound(grab_user_num(
+            "Enter Gradient Rate as Decimal:",
+        )));
+
+        let initial_payment = data::AmountType::Uniform(data::Amount::Fl64(grab_user_num(
+            "Enter the Initial Payment Amount:",
+        )));
+
+        let interest = data::AmountType::InterestRate(data::InterestType::Compound(grab_user_num(
+            "Enter Interest Rate as Decimal:",
+        )));
+
+        let periods = data::AmountType::TimePeriods(data::Amount::In32(grab_user_num(
+            "Enter Number of Compounding Periods:",
+        ) as i32));
+
+        cs(true);
+
+        let result = match investment_calculations::calculations::a_from_g_rate(
+            &initial_payment,
+            &gradient,
+            &periods,
+            &interest,
+        ) {
+            Ok(num) => {
+                let out_num_format = format!("${:.2}", num);
+                gtc(out_num_format.as_str(), 10)
+            }
+            Err(err_mes) => gtc(err_mes.as_str(), 9),
+        };
+
+        println!("Uniform Payment Equivalent of {}: {}", gradient, result);
     }
 }
