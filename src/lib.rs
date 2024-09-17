@@ -29,6 +29,8 @@ pub mod ansi_commands {
 }
 
 pub mod user_interface {
+    use crate::invest_items::data::WIT;
+
     pub fn grab_user_input(text_prompt: &str) -> String {
         let mut output = String::new();
 
@@ -75,8 +77,183 @@ pub mod user_interface {
         out_num
     }
 
-    pub fn get_amount_type(text_prompt: &str) -> super::invest_items::data::AmountType {
-        use super::invest_items::data;
+    //Function used get any of the amount types from the user.
+    pub fn get_user_amount_type(
+        text_prompt: &str,
+    ) -> Option<super::invest_items::data::AmountType> {
+        use super::{ansi_commands, invest_items::data};
+
+        loop {
+            let input = grab_user_input(text_prompt);
+
+            let input = input.trim().to_lowercase();
+
+            match input.as_str() {
+                "p" | "principal" => {
+                    return Some(data::AmountType::Principal(data::Amount::Fl64(
+                        grab_user_num("Enter Principal Amount:"),
+                    )));
+                }
+                "f" | "final" => {
+                    return Some(data::AmountType::Final(data::Amount::Fl64(grab_user_num(
+                        "Enter Final Amount:",
+                    ))));
+                }
+                "a" | "u" | "uniform" => {
+                    return Some(data::AmountType::Uniform(data::Amount::Fl64(
+                        grab_user_num("Enter Uniform Amount:"),
+                    )));
+                }
+                "g" | "arithmetic" => {
+                    return Some(data::AmountType::Gradient(data::Amount::Fl64(
+                        grab_user_num("Enter Arithmetic Gradient Amount:"),
+                    )));
+                }
+                "gr" | "geometric" => {
+                    return Some(data::AmountType::GradientRate(
+                        data::InterestType::Compound(grab_user_num(
+                            "Enter Gradient Rate as Decimal:",
+                        )),
+                    ));
+                }
+                "t" | "periods" => {
+                    return Some(data::AmountType::TimePeriods(data::Amount::Fl64(
+                        grab_user_num("Enter Number of Periods:"),
+                    )));
+                }
+                "i" | "interest" => {
+                    return Some(data::AmountType::InterestRate(
+                        data::InterestType::Compound(grab_user_num("Enter Principal Amount:")),
+                    ));
+                }
+                "?" => {
+                    ansi_commands::clear_screen(true);
+                    println!("Possible inputs are:");
+                    println!("\tPrincipal (P, Principal)");
+                    println!("\tFinal (F, Final)");
+                    println!("\tUniform (A, U, Uniform)");
+                    println!("\tArithmetic Gradient (G, Arithmetic)");
+                    println!("\tGeometric Gradient (GR, Geometric)");
+                    println!("\tInterest Rate (I, Interest)");
+                    continue;
+                }
+                _ => {
+                    println!("Invalid option. Please re-enter (type '?' for list of options)");
+                    continue;
+                }
+            }
+        }
+    }
+
+    pub fn get_user_flow_type() -> super::invest_items::cli_disp::FlowType {
+        use super::invest_items::cli_disp::FlowType;
+
+        loop {
+            let input = grab_user_input("Enter flow type:");
+            let input = input.trim().to_lowercase();
+
+            match input.as_str() {
+                "p" | "payment" => {
+                    return FlowType::Payment;
+                }
+                "w" | "withdrawal" => {
+                    return FlowType::Withdrawal;
+                }
+                "?" => {
+                    super::ansi_commands::clear_screen(true);
+                    println!("Possible inputs are:");
+                    println!("\tPayment (P, Payment)");
+                    println!("\tWithdrawal (W, Withdrawal)");
+                    continue;
+                }
+                _ => {
+                    println!("Invalid option. Please re-enter (type '?' for list of options)");
+                    continue;
+                }
+            }
+        }
+    }
+
+    pub fn get_user_time_type() -> super::invest_items::cli_disp::TimeType {
+        use super::invest_items::cli_disp::TimeType;
+
+        let time_type: String;
+        loop {
+            let input = grab_user_input("What is payment time type:");
+
+            let input = input.trim().to_lowercase();
+
+            time_type = match input.as_str() {
+                "s" | "single" => String::from("single"),
+                "m" | "multi" => String::from("multi"),
+                "r" | "range" => String::from("range"),
+                "?" => {
+                    super::ansi_commands::clear_screen(true);
+                    println!("Possible inputs are:");
+                    println!("\tSingle Flow (S, Single)");
+                    println!("\tMultiple Non-Uniform Flows (M, Multi)");
+                    println!("\tRange (uniform) of Time Flow Occurs (R, Range)");
+                    continue;
+                }
+                _ => {
+                    println!("Invalid option. Please re-enter (type '?' for list of options)");
+                    continue;
+                }
+            };
+
+            break;
+        }
+
+        let out = match time_type.as_str() {
+            "single" => {
+                TimeType::Single(grab_user_num("Enter Time when Single Flow Occurs:") as i32)
+            }
+            "multi" => {
+                let num_times = grab_user_num("How Many Times does Flow Occur:") as i32;
+
+                let mut times: Vec<i32> = vec![];
+
+                for num in 1..=num_times {
+                    times.push(grab_user_num(format!("Flow #{num} Occurs:").as_str()) as i32);
+                }
+
+                TimeType::Multi(times)
+            }
+            "range" => {
+                let first = grab_user_num("What is the Fist Time Flow Occurs:") as i32;
+                let second = grab_user_num("What is the Second Time Flow Occurs:") as i32;
+
+                TimeType::Range((first, second))
+            }
+            _ => panic!("Something went horribly wrong with our get_user_time_type function"),
+        };
+
+        out
+    }
+
+    pub fn build_user_cash_flow() -> super::invest_items::cli_disp::CashFlow {
+        let name = grab_user_input("What would you like to label this cashflow as:");
+
+        let amount: super::invest_items::data::AmountType;
+
+        loop {
+            match get_user_amount_type("What type of cashflow is this:") {
+                Some(return_val) => {
+                    amount = return_val;
+                }
+                None => {
+                    continue;
+                }
+            };
+
+            break;
+        }
+
+        let flow = get_user_flow_type();
+
+        let time_payment = get_user_time_type();
+
+        super::invest_items::cli_disp::CashFlow::new(name.trim(), amount, flow, time_payment)
     }
 
     pub fn user_f_from_p() {

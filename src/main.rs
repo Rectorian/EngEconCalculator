@@ -11,8 +11,17 @@ fn main() {
 
     //run();
 
-    EngEconCalculator::ansi_commands::disable_text_wrapping();
-    EngEconCalculator::invest_items::cli_disp::test_printing();
+    let mut flows: Vec<EngEconCalculator::invest_items::cli_disp::CashFlow> = vec![];
+
+    for _num in 0..3 {
+        flows.push(EngEconCalculator::user_interface::build_user_cash_flow());
+        flows
+            .get_mut(_num)
+            .expect("Not accessible")
+            .set_color((9 + _num) as u8);
+    }
+
+    EngEconCalculator::invest_items::cli_disp::draw_legend(&flows);
 }
 
 fn run() {
