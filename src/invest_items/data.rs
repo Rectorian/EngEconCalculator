@@ -48,6 +48,16 @@ pub enum InterestType {
     Compound(f64),
 }
 
+//Implementing a function to get the value out of the InterestType enum quickly
+impl InterestType {
+    pub fn get_f64(&self) -> f64 {
+        match self {
+            InterestType::Simple(num) => *num,
+            InterestType::Compound(num) => *num,
+        }
+    }
+}
+
 impl std::fmt::Display for InterestType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -77,6 +87,19 @@ pub enum AmountType {
     InterestRate(super::data::InterestType),
 }
 
+//Implementing a function to quickly get the value out of an AmountType as an f64
+impl AmountType {
+    pub fn get_amount(&self) -> f64 {
+        match self {
+            AmountType::GradientRate(inter) | AmountType::InterestRate(inter) => inter.get_f64(),
+            AmountType::Final(amt) => amt.get_f64(),
+            AmountType::Principal(amt) => amt.get_f64(),
+            AmountType::Uniform(amt) => amt.get_f64(),
+            AmountType::Gradient(amt) => amt.get_f64(),
+            AmountType::TimePeriods(amt) => amt.get_f64(),
+        }
+    }
+}
 impl std::fmt::Display for AmountType {
     //We may be able to re-write by creating a string that we have our prepend on and then passing
     //that to the formatter of the bundled data as it seems write just adds onto the buffer given?
